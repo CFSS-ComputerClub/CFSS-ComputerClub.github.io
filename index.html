@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta content="notranslate">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <!-- Meta Tagging -->
+    <title>CFSS Computer Club's Home Page</title>
+    <meta name="description" content="Innovation beyond the classroom, bring the classroom to the students | Holistic Education">
+    <meta name="application-name" content="Computer Club's App">
+    <meta name="apple-mobile-web-app-title" content="Computer Club's App">
+    <meta name="author" content="Woody Tai">
+    <meta name="creator" content="CFSS Computer Club">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="CFSS Computer Club's Home Page">
+    <meta property="og:site_name" content="CFSS Computer Club's Home Page">
+    <meta property="og:description" content="Innovation beyond the classroom, bring the classroom to the students | Holistic Education">
+    <meta property="og:image:width" content="500">
+    <meta property="og:image:height" content="500">
+    <meta property="og:image:alt" content="My Sharing Page Image">
+    <meta property="og:image:type" content="image/png">
+    <meta name="twitter:card" content="Innovation beyond the classroom, bring the classroom to the students | Holistic Education">
+    <meta name="twitter:title" content="CFSS Computer Club's Home Page">
+    <meta name="twitter:description" content="Computer Club's  Personal Website, Resume, Portfolio and Writings">
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/images/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#dfaf46">
+    <link rel="shortcut icon" href="/images/favicon/favicon.ico">
+    <meta name="apple-mobile-web-app-title" content="Computer Club's Webapp'">
+    <meta name="application-name" content="Computer Club's Webapp'">
+    <meta name="msapplication-TileColor" content="#9f00a7">
+    <meta name="msapplication-config" content="/images/favicon/browserconfig.xml">
+    <meta name="theme-color" content="#333333">
+    <!-- Misc -->
+    <link rel="icon" href="./images/logos/Website_Logo.png" type="image/png" sizes="HeightxWidth|any">
+    <link rel="stylesheet" type="text/css" href="./css/styles.css">
+    <link rel="stylesheet" type="text/css" href="https://science-direct.github.io/css/cfsscomclub.css">
+    <script src="./js/script.js"></script>
+</head>
+<body>
+    <header>
+        <div>
+            <a href=""><img class="logo" alt="Computer Club's  logo" src="images/logos/ComputerClubLogo.png"></a>
+        </div>
+        <div class="menu">
+            <nav>
+                <a href="./about">About Us</a>
+                <a href="./activities">Activities</a>
+                <a href="./articles">Insights</a>
+                <a href="./contact">Contact</a>
+            </nav>
+        </div>
+        <div class="mode-switch" onclick="toggleDarkMode()">🌙</div>
+    </header>
+    <div class="og-div">
+        <div class="content">
+            <div id="notification" class="notification">
+                Are you interested in our Cicada workshop? 
+                <button class="btn" id="okBtn">YES!</button>
+            </div>
+            <h2>Hello There!<br>We're the Computer Club :D</h2>
+            <p>We are a club based in <a href="https://cfss.edu.hk/">The Chinese Foundation Secondary School</a>, helping students to achieve personal excellence through learning about technology via hands on projects.</p>
+            <p>Are you ready to join and be a part of something extraordinary? <br>We welcome all members, together let's unlock access to upcoming activities and workshops. For more information, feel free to email us!<br> Mr. Ho(TIC) @ <a href="mailto:hth@cfss.edu.hk">hth@cfss.edu.hk</a><br>Woody(Chairperson) @ <a href="mailto:20210135@cfss.edu.hk">20210135@cfss.edu.hk</a>
+            </p>
+            <div class="button-wrapper">
+                <a style="margin-right: 15%;" class="button" href="./about">More about us</a>
+                <a class="button" href="./activities">Activities</a>
+            </div>
+        </div>
+    </div>
+    <div class="content" style="margin-top: var(--space-small);">
+    </div>
+
+    <footer class="footer">
+            <h3><a class="footer" href="https://cfss.edu.hk/" target="_blank">School Page </a>
+            // <a class="footer" href="https://www.instagram.com/cfss_computerclub/">Instragram</a>
+            // <a class="footer" href="mailto:20210135@cfss.edu.hk" target="_blank">Email</a></h3>
+            <p> © 2024 Computer Club </p>
+    </footer>
+    <script>
+        // Function to toggle dark mode
+        function toggleDarkMode() {
+            const currentMode = document.body.classList.contains('dark-mode') ? 'dark-mode' : 'light-mode';
+            const newMode = currentMode === 'dark-mode' ? 'light-mode' : 'dark-mode';
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('mode', newMode);
+        }
+
+        // Check for saved mode on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedMode = localStorage.getItem('mode');
+            if (savedMode) {
+                document.body.classList.add(savedMode);
+            }
+        });
+    </script>
+    <script>
+        const notification = document.getElementById('notification');
+        const okBtn = document.getElementById('okBtn');
+
+        window.onload = function() {
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 2000);
+        };
+
+        okBtn.onclick = function() {
+            window.open('https://science-direct.github.io/redirect/?CFSSComputerCicada');
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta content="notranslate">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,minimum-scale=1">
+    <!-- Meta Tagging -->
+    <title>CFSS Computer Club's Insight articles</title>
+    <meta name="description" content="Innovation beyond the classroom, bring the classroom to the students | Holistic Education">
+    <meta name="application-name" content="Computer Club's App">
+    <meta name="apple-mobile-web-app-title" content="Computer Club's App">
+    <meta name="author" content="Woody Tai">
+    <meta name="creator" content="CFSS Computer Club">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="CFSS Computer Club's Insight articles">
+    <meta property="og:site_name" content="Computer Club's Articles">
+    <meta property="og:description" content="Innovation beyond the classroom, bring the classroom to the students | Holistic Education">
+    <meta property="og:image:width" content="500">
+    <meta property="og:image:height" content="500">
+    <meta property="og:image:alt" content="My Sharing Page Image">
+    <meta property="og:image:type" content="image/png">
+    <meta name="twitter:card" content="Innovation beyond the classroom, bring the classroom to the students | Holistic Education">
+    <meta name="twitter:title" content="CFSS Computer Club's Insight articles">
+    <meta name="twitter:description" content="Computer Club's  Personal Website, Resume, Portfolio and Writings">
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/images/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/images/favicon/safari-pinned-tab.svg" color="#dfaf46">
+    <link rel="shortcut icon" href="/images/favicon/favicon.ico">
+    <meta name="apple-mobile-web-app-title" content="Computer Club's Webapp'">
+    <meta name="application-name" content="Computer Club's Webapp'">
+    <meta name="msapplication-TileColor" content="#9f00a7">
+    <meta name="msapplication-config" content="/images/favicon/browserconfig.xml">
+    <meta name="theme-color" content="#333333">
+    <!-- Misc -->
+    <link rel="icon" href="./images/logos/Website_Logo.png" type="image/png" sizes="HeightxWidth|any">
+    <link rel="stylesheet" type="text/css" href="./css/styles.css">
+    <link rel="stylesheet" type="text/css" href="https://science-direct.github.io/css/cfsscomclub.css">
+    <script src="./js/script.js"></script>
+</head>
+<body>
+    <header>
+        <div>
+            <a href=""><img class="logo" alt="Computer Club's  logo" src="images/logos/ComputerClubLogo.png"></a>
+        </div>
+        <div class="menu">
+            <nav>
+                <a href="./about">About Us</a>
+                <a href="./activities">Activities</a>
+                <a class="active" href="./articles">Insights</a>
+                <a href="./contact">Contact</a>
+            </nav>
+        </div>
+        <div class="mode-switch" onclick="toggleDarkMode()">🌙</div>
+    </header>
+
+    <div class="content" style="margin-top: var(--space-small);">
+      <article>
+        <h1>Insights</h1>
+        <h2 id="articles_subtitle">Reviewing and churning out bite sized technology related articles.</h2>
+        <br>
+        <div>
+          <div class="articles-filter-buttons" id="article-div-border-button"> 
+            <button class="articles-filter-button active" data-filter="all">All</button>
+            <button class="articles-filter-button" data-filter="position">Position Paper</button>
+            <button class="articles-filter-button" data-filter="advocacy">Op-Ed / Advocacy</button>
+            <button class="articles-filter-button" data-filter="tech">Technology</button>
+            <button class="articles-filter-button" data-filter="misc">Other</button>
+          </div>
+          <div class="articles-cards-container">
+            <h2 class="media_year_id" id="year2024">2024</h2>
+            <div class="articles-card" data-type="advocacy tech">
+              <h6>
+                R R R, so many hard Rs in our new tech-infused world
+                <a class="articles-card-a-tag" href="https://medium.com/@woody.tai/r-r-r-so-many-hard-rs-in-our-new-tech-infused-world-0a6840d28dfc" target="_blank">[Medium]</a>
+              </h6>
+              <time datetime="2024-08-25">2024-08-25</time>
+            </div>
+
+            <div class="articles-card" data-type="advocacy tech"></div>
+              <h6>
+                The Evolving Landscape of Technology Literacy 
+                <a class="articles-card-a-tag" href="https://medium.com/@woody.tai/the-evolving-landscape-of-technology-literacy-4f522ca43eb6" target="_blank">[Medium]</a>
+              </h6>
+              <time datetime="2024-08-01">2024-08-01</time>
+            </div>
+          </div>
+        </div>
+        <br>
+        <br>
+        <br>
+        <br>
+      </article>
+    </div>
+
+    <div class="footer">
+        <div>
+          <footer class="footer">
+            <h3><a class="footer" href="https://cfss.edu.hk/" target="_blank">School Page </a>
+            // <a class="footer" href="https://www.instagram.com/cfss_computerclub/">Instragram</a>
+            // <a class="footer" href="mailto:20210135@cfss.edu.hk" target="_blank">Email</a></h3>
+            <p> © 2024 Computer Club </p>
+    </footer>
+        </div>
+    </div>
+</body>
+</html>
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function() {
+      const filterButtons = document.querySelectorAll('.articles-filter-button');
+      const cards = document.querySelectorAll('.articles-card');
+
+      filterButtons.forEach(button => {
+          button.addEventListener('click', function() {
+              const filters = this.dataset.filter.split(',');
+
+              filterButtons.forEach(btn => btn.classList.remove('active'));
+              this.classList.add('active');
+
+              cards.forEach(card => {
+                  const cardTypes = card.getAttribute('data-type').split(' ');
+
+                  if (filters.includes('all') || filters.some(filter => cardTypes.includes(filter.trim()))) {
+                      card.style.display = 'block';
+                  } else {
+                      card.style.display = 'none';
+                  }
+              });
+          });
+      });
+  });
+  </script>
+  <script>
+    function showImage(image_source) {
+      var imageContainer = document.createElement("div");
+      imageContainer.className = "image-container";
+
+      var image = document.createElement("img");
+      image.src = image_source;
+      var closeButton = document.createElement("button");
+      closeButton.textContent = "☒";
+      closeButton.className = "close-btn";
+      document.addEventListener('keydown', function(event) {
+        if (event.code === 'Space' || event.code === 'Enter') {
+            closeButton.onclick();
+        }
+      });
+      closeButton.onclick =function () {
+        document.body.removeChild(imageContainer);
+          };
+      imageContainer.appendChild(closeButton);
+      imageContainer.appendChild(image);
+      document.body.appendChild(imageContainer);
+    }
+  </script>
+  <script>
+        // Function to toggle dark mode
+        function toggleDarkMode() {
+            const currentMode = document.body.classList.contains('dark-mode') ? 'dark-mode' : 'light-mode';
+            const newMode = currentMode === 'dark-mode' ? 'light-mode' : 'dark-mode';
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('mode', newMode);
+        }
+
+        // Check for saved mode on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedMode = localStorage.getItem('mode');
+            if (savedMode) {
+                document.body.classList.add(savedMode);
+            }
+        });
+    </script>

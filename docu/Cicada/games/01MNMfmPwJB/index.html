@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../../../css/styles.css">
+    <title>Puzzle Page</title>
+</head>
+<body>
+    <a href="/"><img class="logo" alt="Computer Club's  logo" src="../../../../images/logos/ComputerClubLogo.png"></a>
+    <!--  -->
+    <div style="justify-items: center;">
+        <div id="context">
+            <h2>Puzzle Instructions</h2>
+            <p>Analyse the rectangle bellow</p>
+        </div>
+        <div style="border-style: solid; width: 80%; height: 50vh;">
+            <div style="height: 100%; width: 100%; background-color: #eb320e;">
+    
+            </div>
+        </div>
+    </div>
+    <!--  -->
+    <br><br>
+    <div style="justify-items: center;"><div class="mode-switch" onclick="toggleDarkMode()">🌙</div></div>
+    <script>
+        // Function to toggle dark mode
+        function toggleDarkMode() {
+            const currentMode = document.body.classList.contains('dark-mode') ? 'dark-mode' : 'light-mode';
+            const newMode = currentMode === 'dark-mode' ? 'light-mode' : 'dark-mode';
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('mode', newMode);
+        }
+    
+        // Check for saved mode on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedMode = localStorage.getItem('mode');
+            if (savedMode) {
+                document.body.classList.add(savedMode);
+            }
+        });
+    </script>
+    
+</body>
+</html>
