@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <div id="gameOverlay">
+        <div>My Health: <span id="userHealthText">50</span></div>
+        <div class="health-bar"><div id="userHealthBar" class="health-bar-fill"></div></div>
+        <div>Target Health: <span id="TargetHealthText">75</span></div>
+        <div class="health-bar"><div id="TargetHealthBar" class="health-bar-fill"></div></div>
+        <div>Defender Health: <span id="defenderHealthText">150</span></div>
+        <div class="health-bar"><div id="defenderHealthBar" class="health-bar-fill"></div></div>
+    </div>
+    <div id="gameMessage">
+        <div id="messageText"></div>
+        <button id="restartButton">Play Again</button>
+    </div>
+    <div class="instructions">
+        <p>WASD or Arrow Keys: Move | Mouse: Look | Click: Shoot | Goal: Defeat the Target</p>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();    
+        
+        user = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            size: 20,
+            speed: 2.55,
+            health: 50,
+            rotationSpeed: 0.05,
+            rotation: 0,
+            color: 'red',
+            bullets: []
+        };
+        
+        const Target = {
+            x: canvas.width / 4,
+            y: canvas.height / 4,
+            size: 20,
+            speed: 2.5,
+            health: 100,
+            color: 'blue'
+        };
+        
+        const defender = {
+            x: canvas.width * 3/4,
+            y: canvas.height * 3/4,
+            size: 25,
+            speed: 2,
+            health: 200,
+            color: 'green',
+            bullets: [],
+            fireRate: 450,
+            lastFired: 0,
+            rotation: 0,
+            targetX: canvas.width * 3/4,
+            targetY: canvas.height * 3/4,
+            pathUpdateTimer: 0
+        };
+        
+        const camera = {
+            x: 0,
+            y: 0,
+            zoom: 1,
+            follow: function(target) {
+                this.x = target.x - canvas.width / 2;
+                this.y = target.y - canvas.height / 2;
+            }
+        };
+        
+        // DO NOT CHANGE CODE AFTER THIS
+
+        const keys = {};
+        
+        window.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+        });
+        
+        window.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+        
+        let mouseX = 0;
+        let mouseY = 0;
+        
+        canvas.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            const dx = mouseX - canvas.width / 2;
+            const dy = mouseY - canvas.height / 2;
+            user.rotation = Math.atan2(dy, dx);
+        });
+        
+        canvas.addEventListener('click', () => {
+            user.bullets.push({
+                x: user.x,
+                y: user.y,
+                speed: 2,
+                direction: user.rotation,
+                size: 5,
+                color: 'yellow'
+            });
+        });
+
+        
+        
+        document.getElementById('restartButton').addEventListener('click', () => {
+            resetGame();
+            document.getElementById('gameMessage').style.display = 'none';
+        });
+        
+        function moveuser() {
+            if ((keys['w'] || keys['ArrowUp']) && !isGameOver()) {
+                user.x += Math.cos(user.rotation) * user.speed;
+                user.y += Math.sin(user.rotation) * user.speed;
+            }
+            if ((keys['s'] || keys['ArrowDown']) && !isGameOver()) {
+                user.x -= Math.cos(user.rotation) * user.speed;
+                user.y -= Math.sin(user.rotation) * user.speed;
+            }
+            if ((keys['a'] || keys['ArrowLeft']) && !isGameOver()) {
+                user.x += Math.cos(user.rotation - Math.PI/2) * user.speed;
+                user.y += Math.sin(user.rotation - Math.PI/2) * user.speed;
+            }
+            if ((keys['d'] || keys['ArrowRight']) && !isGameOver()) {
+                user.x += Math.cos(user.rotation + Math.PI/2) * user.speed;
+                user.y += Math.sin(user.rotation + Math.PI/2) * user.speed;
+            }
+            if (keys['x'] && !isGameOver()) {
+                user.health += 1
+            }
+
+            if ((keys['`']) && !isGameOver()) {
+                user.bullets.push({
+                x: user.x,
+                y: user.y,
+                speed: 2,
+                direction: user.rotation,
+                size: 5,
+                color: 'yellow'
+                });
+            }
+            
+            user.x = Math.max(0, Math.min(user.x, 2000));
+            user.y = Math.max(0, Math.min(user.y, 2000));
+            
+            camera.follow(user);
+        }
+        
+        function moveTarget() {
+            const dx = Target.x - user.x;
+            const dy = Target.y - user.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            
+            if (dist < 250) {
+                const angle = Math.atan2(dy, dx);
+                Target.x += Math.cos(angle) * Target.speed;
+                Target.y += Math.sin(angle) * Target.speed;
+            } else {
+                if (Math.random() < 0.02) {
+                    Target.x += (Math.random() - 0.5) * Target.speed * 10;
+                    Target.y += (Math.random() - 0.5) * Target.speed * 10;
+                }
+            }
+            
+            Target.x = Math.max(0, Math.min(Target.x, 2000));
+            Target.y = Math.max(0, Math.min(Target.y, 2000));
+        }
+        
+        function moveDefender() {
+            if (Date.now() - defender.pathUpdateTimer > 2000) {
+                defender.targetX = user.x + (Math.random() - 0.5) * 300;
+                defender.targetY = user.y + (Math.random() - 0.5) * 300;
+                defender.pathUpdateTimer = Date.now();
+            }
+            const dx = defender.targetX - defender.x;
+            const dy = defender.targetY - defender.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist > 5) {
+                defender.x += (dx / dist) * defender.speed;
+                defender.y += (dy / dist) * defender.speed;
+            }
+            defender.rotation = Math.atan2(user.y - defender.y, user.x - defender.x);
+            defender.x = Math.max(0, Math.min(defender.x, 2000));
+            defender.y = Math.max(0, Math.min(defender.y, 2000));
+            const distTouser = Math.sqrt(
+                Math.pow(user.x - defender.x, 2) + 
+                Math.pow(user.y - defender.y, 2)
+            );
+            const now = Date.now();
+            if (now - defender.lastFired > defender.fireRate && distTouser < 400) {
+                defender.bullets.push({
+                    x: defender.x,
+                    y: defender.y,
+                    speed: 8,
+                    direction: defender.rotation,
+                    size: 5,
+                    color: 'cyan'
+                });
+                defender.lastFired = now;
+            }
+        }
+        
+        function updateBullets() {
+            for (let i = user.bullets.length - 1; i >= 0; i--) {
+                const bullet = user.bullets[i];
+                bullet.x += Math.cos(bullet.direction) * bullet.speed;
+                bullet.y += Math.sin(bullet.direction) * bullet.speed;
+                
+                if (bullet.x < 0 || bullet.x > 2000 || bullet.y < 0 || bullet.y > 2000) {
+                    user.bullets.splice(i, 1);
+                    continue;
+                }
+                
+                const hdx = bullet.x - Target.x;
+                const hdy = bullet.y - Target.y;
+                const hdist = Math.sqrt(hdx * hdx + hdy * hdy);
+                
+                if (hdist < Target.size + bullet.size) {
+                    Target.health = Math.max(0, Target.health - 5);
+                    user.bullets.splice(i, 1);
+                    updateHealthBars();
+                    
+                    if (Target.health <= 0) {
+                        showGameOver(true);
+                    }
+                    continue;
+                }
+                
+                const rdx = bullet.x - defender.x;
+                const rdy = bullet.y - defender.y;
+                const rdist = Math.sqrt(rdx * rdx + rdy * rdy);
+                
+                if (rdist < defender.size + bullet.size) {
+                    defender.health = Math.max(0, defender.health - 5);
+                    user.bullets.splice(i, 1);
+                    updateHealthBars();
+                    continue;
+                }
+            }
+            
+            for (let i = defender.bullets.length - 1; i >= 0; i--) {
+                const bullet = defender.bullets[i];
+                bullet.x += Math.cos(bullet.direction) * bullet.speed;
+                bullet.y += Math.sin(bullet.direction) * bullet.speed;
+                
+                if (bullet.x < 0 || bullet.x > 2000 || bullet.y < 0 || bullet.y > 2000) {
+                    defender.bullets.splice(i, 1);
+                    continue;
+                }
+                
+                const edx = bullet.x - user.x;
+                const edy = bullet.y - user.y;
+                const edist = Math.sqrt(edx * edx + edy * edy);
+                
+                if (edist < user.size + bullet.size) {
+                    user.health = Math.max(0, user.health - 5);
+                    defender.bullets.splice(i, 1);
+                    updateHealthBars();
+                    
+                    if (user.health <= 0) {
+                        showGameOver(false);
+                    }
+                    continue;
+                }
+            }
+        }
+        
+        function drawWorld() {
+            ctx.strokeStyle = '#444';
+            ctx.lineWidth = 1;
+            
+            const gridSize = 100;
+            const offsetX = -camera.x % gridSize;
+            const offsetY = -camera.y % gridSize;
+            
+            for (let x = offsetX; x < canvas.width; x += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            
+            for (let y = offsetY; y < canvas.height; y += gridSize) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+        }
+        
+        function drawEntity(entity, isuser = false) {
+            const screenX = entity.x - camera.x;
+            const screenY = entity.y - camera.y;
+            
+            ctx.fillStyle = entity.color;
+            ctx.beginPath();
+            ctx.arc(screenX, screenY, entity.size, 0, Math.PI * 2);
+            ctx.fill();
+            
+            if (isuser || entity === defender) {
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(screenX, screenY);
+                ctx.lineTo(
+                    screenX + Math.cos(entity.rotation) * entity.size * 1.5,
+                    screenY + Math.sin(entity.rotation) * entity.size * 1.5
+                );
+                ctx.stroke();
+            }
+        }
+        
+        function drawBullets() {
+            user.bullets.forEach(bullet => {
+                const screenX = bullet.x - camera.x;
+                const screenY = bullet.y - camera.y;
+                
+                ctx.fillStyle = bullet.color;
+                ctx.beginPath();
+                ctx.arc(screenX, screenY, bullet.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            
+            defender.bullets.forEach(bullet => {
+                const screenX = bullet.x - camera.x;
+                const screenY = bullet.y - camera.y;
+                
+                ctx.fillStyle = bullet.color;
+                ctx.beginPath();
+                ctx.arc(screenX, screenY, bullet.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+        
+        function updateHealthBars() {
+            document.getElementById('userHealthText').textContent = user.health;
+            document.getElementById('TargetHealthText').textContent = Target.health;
+            document.getElementById('defenderHealthText').textContent = defender.health;
+            
+            document.getElementById('userHealthBar').style.width = `${user.health}%`;
+            document.getElementById('TargetHealthBar').style.width = `${Target.health}%`;
+            document.getElementById('defenderHealthBar').style.width = `${defender.health}%`;
+            
+            if (user.health < 30) {
+                document.getElementById('userHealthBar').style.backgroundColor = 'red';
+            } else if (user.health < 60) {
+                document.getElementById('userHealthBar').style.backgroundColor = 'orange';
+            }
+            
+            if (Target.health < 30) {
+                document.getElementById('TargetHealthBar').style.backgroundColor = 'red';
+            } else if (Target.health < 60) {
+                document.getElementById('TargetHealthBar').style.backgroundColor = 'orange';
+            }
+            
+            if (defender.health < 30) {
+                document.getElementById('defenderHealthBar').style.backgroundColor = 'red';
+            } else if (defender.health < 60) {
+                document.getElementById('defenderHealthBar').style.backgroundColor = 'orange';
+            }
+        }
+        
+        function isGameOver() {
+            return user.health <= 0 || Target.health <= 0;
+        }
+        
+        function showGameOver(playerWon) {
+            const messageText = document.getElementById('messageText');
+            if (playerWon) {
+                messageText.textContent = 'YOU WIN! You successfully defeated the Target!';
+                messageText.style.color = '#4CAF50';
+            } else {
+                messageText.textContent = 'YOU LOSE! The defender defeated you.';
+                messageText.style.color = '#f44336';
+            }
+            document.getElementById('gameMessage').style.display = 'block';
+        }
+        
+        function resetGame() {
+            user.x = canvas.width / 2;
+            user.y = canvas.height / 2;
+            user.health = 50;
+            user.bullets = [];
+            
+            Target.x = canvas.width / 4;
+            Target.y = canvas.height / 4;
+            Target.health = 75;
+            
+            defender.x = canvas.width * 3/4;
+            defender.y = canvas.height * 3/4;
+            defender.health = 150;
+            defender.bullets = [];
+            defender.targetX = defender.x;
+            defender.targetY = defender.y;
+            
+            updateHealthBars();
+        }
+        
+        function gameLoop() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (!isGameOver()) {
+                moveuser();
+                moveTarget();
+                moveDefender();
+                updateBullets();
+            }
+            
+            drawWorld();
+            drawEntity(Target);
+            drawEntity(defender, true);
+            drawEntity(user, true);
+            drawBullets();
+            
+            requestAnimationFrame(gameLoop);
+        }
+        
+        updateHealthBars();
+        gameLoop();
+    </script>
+</body>
+<head>
+
+</head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Defender Defender</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        #gameCanvas {
+            background: #333;
+            display: block;
+            width: 100%;
+            height: 100vh;
+        }
+        #gameOverlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-size: 16px;
+        }
+        #gameMessage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 36px;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            display: none;
+        }
+        #restartButton {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .health-bar {
+            width: 100px;
+            height: 15px;
+            background: #555;
+            margin-top: 5px;
+            position: relative;
+        }
+        .health-bar-fill {
+            height: 100%;
+            background: #4CAF50;
+            width: 100%;
+            transition: width 0.2s;
+        }
+        .instructions {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            color: white;
+            font-size: 14px;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+</html>

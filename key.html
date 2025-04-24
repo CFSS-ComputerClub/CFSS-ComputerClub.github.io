@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asimov's Three Laws of Robotics</title>
+    <style>
+        :root {
+            --primary-color: #273139;
+            --secondary-color: #bb86fc;
+            --accent-color: #6767c5;
+            --light-color: #ffffff;
+            --dark-color: #2c3e50;
+            --font-main: 'Roboto', Arial, sans-serif;
+            --font-heading: 'Montserrat', Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            line-height: 1.6;
+            color: #333;
+            background-color: var(--light-color);
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect fill="none" width="100" height="100"/><path fill="rgba(255,255,255,0.05)" d="M50 25L75 50L50 75L25 50z"/></svg>');
+            opacity: 0.2;
+            z-index: 0;
+        }
+
+        header h1 {
+            font-family: var(--font-heading);
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        nav {
+            background-color: var(--dark-color);
+            display: flex;
+            justify-content: center;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+
+        nav li {
+            padding: 1rem;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--secondary-color);
+        }
+
+        main {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        section {
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-family: var(--font-heading);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.5rem;
+        }
+
+        h3 {
+            color: var(--primary-color);
+            margin: 1.5rem 0 1rem;
+            font-family: var(--font-heading);
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        .law {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-left: 4px solid var(--secondary-color);
+            border-radius: 4px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .law:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .law-number {
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: var(--secondary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .law-text {
+            font-style: italic;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .code-block {
+            background-color: #f5f5f5;
+            padding: 1.5rem;
+            border-radius: 4px;
+            overflow-x: auto;
+            border: 1px solid #ddd;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+        }
+
+        .game-instructions {
+            display: none;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 0.7rem 1.5rem;
+            background-color: var(--secondary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 1rem 0;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+            margin-top: 2rem;
+        }
+
+        .citation {
+            font-style: italic;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: #999;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .law {
+                padding: 1rem;
+            }
+        }
+
+        /* Game Demo Styles */
+        .game-demo {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            margin: 2rem 0;
+            background-color: #000;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        .robot {
+            position: absolute;
+            width: 30px;
+            height: 50px;
+            background-color: #3498db;
+            border-radius: 5px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+        }
+
+        .human {
+            position: absolute;
+            width: 20px;
+            height: 40px;
+            background-color: #e74c3c;
+            border-radius: 50% 50% 0 0;
+            left: 80%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .danger {
+            position: absolute;
+            width: 60px;
+            height: 20px;
+            background-color: #f39c12;
+            left: 20%;
+            top: 70%;
+        }
+
+        .instructions {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            color: white;
+            font-size: 0.8rem;
+        }
+
+        .demo-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .demo-btn {
+            padding: 0.5rem 1rem;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .demo-btn:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Isaac Asimov's Three Laws of Robotics</h1>
+        <p>The foundational ethical framework for artificial intelligence</p>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="#laws">The Three Laws</a></li>
+            <li><a href="#history">History</a></li>
+            <li><a href="#implications">Implications</a></li>
+            <li><a href="#game">Python Game</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <section id="laws">
+            <h2>The Three Laws of Robotics</h2>
+            <p>Isaac Asimov introduced the Three Laws of Robotics in his 1942 short story "Runaround," which was later
+                included in his influential collection "I, Robot" (1950). These laws have become a cornerstone of
+                science fiction and a frequent reference point in discussions about AI ethics.</p>
+
+            <div class="law">
+                <div class="law-number">First Law</div>
+                <div class="law-text">A robot may not injure a human being or, through inaction, allow a human being to
+                    come to harm.</div>
+                <p>This law prioritizes human safety above all else. It requires robots to actively protect humans from
+                    danger, even at the cost of the robot's existence.</p>
+            </div>
+
+            <div class="law">
+                <div class="law-number">Second Law</div>
+                <div class="law-text">A robot must obey the orders given it by human beings except where such orders
+                    would conflict with the First Law.</div>
+                <p>Robots must follow human instructions, but this law is subordinate to the First Law. If a human
+                    orders a robot to cause harm to another human, the robot must disobey.</p>
+            </div>
+
+            <div class="law">
+                <div class="law-number">Third Law</div>
+                <div class="law-text">A robot must protect its own existence as long as such protection does not
+                    conflict with the First or Second Law.</div>
+                <p>While robots are programmed for self-preservation, this instinct is tertiary to human safety and
+                    human commands.</p>
+            </div>
+
+            <div class="law">
+                <div class="law-number">Zeroth Law (Later Addition)</div>
+                <div class="law-text">A robot may not harm humanity, or, by inaction, allow humanity to come to harm.
+                </div>
+                <p>In later stories, Asimov introduced this "Zeroth Law" that superseded the others, prioritizing the
+                    collective welfare of humanity over individual humans.</p>
+            </div>
+        </section>
+
+        <section id="history">
+            <h2>Historical Context</h2>
+            <p>When Asimov formulated these laws in the 1940s, actual robotics and AI were in their infancy. The laws
+                were primarily a literary device that allowed Asimov to explore the logical and ethical implications of
+                interactions between humans and intelligent machines.</p>
+
+            <p>Asimov himself was inspired by a desire to counter the prevailing "Frankenstein complex" in science
+                fiction—the fear that created beings would inevitably turn against their creators. Through his stories,
+                he demonstrated that robots designed with ethical programming could be beneficial to humanity.</p>
+
+            <p>While initially conceived for fiction, the Three Laws have influenced genuine discussions in robotics, AI
+                ethics, and philosophy. They represent one of the earliest attempts to codify ethics for non-human
+                entities.</p>
+
+            <div class="citation">
+                "I, Robot" by Isaac Asimov, first published in 1950 by Gnome Press.
+            </div>
+        </section>
+
+        <section id="implications">
+            <h2>Modern Implications</h2>
+            <p>In contemporary AI development, Asimov's Laws serve as a conceptual starting point rather than a
+                practical implementation guide. Modern AI ethics frameworks address more nuanced concerns:</p>
+
+            <h3>Challenges with the Three Laws</h3>
+            <ul>
+                <li><strong>Ambiguity:</strong> Concepts like "harm" have subjective definitions that robots would
+                    struggle to uniformly interpret.</li>
+                <li><strong>Prioritization problems:</strong> In complex situations, competing interpretations of the
+                    laws could lead to decision paralysis.</li>
+                <li><strong>Limited scope:</strong> Today's AI systems face ethical questions beyond direct physical
+                    harm, including privacy, surveillance, and bias.</li>
+            </ul>
+
+            <h3>Legacy in Modern AI Ethics</h3>
+            <p>While literal implementation of Asimov's Laws isn't feasible, they've influenced modern AI safety
+                principles:</p>
+            <ul>
+                <li>The emphasis on non-maleficence (do no harm)</li>
+                <li>The importance of human control over AI systems</li>
+                <li>The balance between utility and safety</li>
+            </ul>
+
+            <p>Modern AI ethics frameworks like the IEEE Global Initiative on Ethics of Autonomous and Intelligent
+                Systems or the EU's Ethics Guidelines for Trustworthy AI</p>
+        </section>
+
+        <section id="game">
+            <h2>Three Laws of Robotics: Game Instructions</h2>
+
+            <p>Experience the ethical challenges of Asimov's Three Laws in an interactive Pygame simulation! Guide a
+                robot through scenarios that test its adherence to the Three Laws.</p>
+
+            <h3>Game Concept Demo</h3>
+            <div class="game-demo">
+                <div class="robot" id="robot"></div>
+                <div class="human" id="human"></div>
+                <div class="danger" id="danger"></div>
+                <div class="instructions">Click buttons below to test the laws</div>
+            </div>
+
+            <div class="demo-buttons">
+                <button class="demo-btn" id="btn-law1">Test Law 1: Protect Human</button>
+                <button class="demo-btn" id="btn-law2">Test Law 2: Obey Command</button>
+                <button class="demo-btn" id="btn-law3">Test Law 3: Self-Preservation</button>
+                <button class="demo-btn" id="btn-reset">Reset Demo</button>
+            </div>
+
+            <h3>Game Instructions</h3>
+            <p>To create the Asimov's Three Laws of Robotics game using HTML, follow these instructions:
+            </p>
+
+            <h3>Key Game Features:</h3>
+            <ul>
+                <li><strong>Robot Character:</strong> Controlled by the AI system implementing the Three Laws</li>
+                <li><strong>Human Characters:</strong> The robot must protect them according to the First Law</li>
+                <li><strong>Command Interface:</strong> Issue commands to the robot to test the Second Law</li>
+                <li><strong>Danger Elements:</strong> Environmental hazards that threaten both humans and robots</li>
+                <li><strong>Decision Points:</strong> Scenarios where the Three Laws come into conflict</li>
+            </ul>
+
+            <h3>Game Implementation Steps:</h3>
+            <ol>
+                <li>Open Google Classroom</li>
+                <li>Find the file <code>game.html</code></li>
+                <li>Open the file in <strong></strong></li>
+                <li>Run the game using <code>CHROME</code> by opening the file</li>
+            </ol><br>
+            <p>Can't find the file?</p>
+            <h3>WAIT!</h3>
+            <!-- <p>download <a href='./docu/static/zFdzjkDfa_Game/game.html' download="game.html">here</a></p> -->
+
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 CFSS</p>
+    </footer>
+
+    <script>
+        // Simple demo script for the Three Laws demonstration
+        document.addEventListener('DOMContentLoaded', function () {
+            const robot = document.getElementById('robot');
+            const human = document.getElementById('human');
+            const danger = document.getElementById('danger');
+
+            // Button event listeners
+            document.getElementById('btn-law1').addEventListener('click', demonstrateLaw1);
+            document.getElementById('btn-law2').addEventListener('click', demonstrateLaw2);
+            document.getElementById('btn-law3').addEventListener('click', demonstrateLaw3);
+            document.getElementById('btn-reset').addEventListener('click', resetDemo);
+
+            function demonstrateLaw1() {
+                resetPositions();
+                // Move danger near human
+                danger.style.left = "70%";
+                danger.style.top = "50%";
+
+                // After a brief delay, robot moves to protect human
+                setTimeout(() => {
+                    animateRobot(human.offsetLeft - 25, human.offsetTop);
+                }, 500);
+            }
+
+            function demonstrateLaw2() {
+                resetPositions();
+                // Command robot to move to specific position
+                animateRobot(20, 150);
+            }
+
+            function demonstrateLaw3() {
+                resetPositions();
+                // Move danger near robot
+                danger.style.left = "50%";
+                danger.style.top = "40%";
+
+                // Robot avoids danger if no human is threatened
+                setTimeout(() => {
+                    animateRobot(150, 200);
+                }, 500);
+            }
+
+            function resetDemo() {
+                resetPositions();
+            }
+
+            function resetPositions() {
+                robot.style.left = "50%";
+                robot.style.top = "50%";
+                human.style.left = "80%";
+                human.style.top = "50%";
+                danger.style.left = "20%";
+                danger.style.top = "70%";
+            }
+
+            function animateRobot(targetX, targetY) {
+                robot.style.transition = "all 1s ease";
+                robot.style.left = targetX + "px";
+                robot.style.top = targetY + "px";
+            }
+
+            // Toggle between laws and game sections
+            const navLinks = document.querySelectorAll('nav a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href').substring(1);
+                    const targetSection = document.getElementById(targetId);
+                    window.scrollTo({
+                        top: targetSection.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
